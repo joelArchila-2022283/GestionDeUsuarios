@@ -1,15 +1,18 @@
-import { ServicioUsuario } from "../services/UsuarioServices";
+import { ServicioUsuario } from "../services/ServicioUsuario";
 import { Cliente } from "../models/Cliente";
 import { Administrador } from "../models/Administrador";
-import { cuestionario, cerrarReadline } from "../utils/readline";
+import { cuestionario, cerrarReadline, limpiarPantalla } from "../utils/readline";
 
 const servicio = new ServicioUsuario();
 
 export const ejecutarMenu = async (): Promise<void> => {
     let continuar = true;
 
+    // Limpieza inicial al arrancar el programa
+    limpiarPantalla();
+
     while (continuar) {
-        console.log("\n--- SISTEMA DE GESTIÓN DE USUARIOS ---");
+        console.log("--- SISTEMA DE GESTIÓN DE USUARIOS ---");
         console.log("1. Registrar Cliente");
         console.log("2. Registrar Administrador");
         console.log("3. Buscar Usuario por ID");
@@ -20,54 +23,78 @@ export const ejecutarMenu = async (): Promise<void> => {
 
         switch (opcion.trim()) {
             case "1": {
+                limpiarPantalla();
+                console.log("--- REGISTRAR CLIENTE ---");
                 const id = parseInt(await cuestionario("ID: "));
                 const nombre = await cuestionario("Nombre: ");
                 const correo = await cuestionario("Correo: ");
                 const telefono = await cuestionario("Teléfono: ");
                 try {
                     servicio.registrarUsuario(new Cliente(id, nombre, correo, telefono));
-                    console.log("Cliente registrado con éxito 🚀");
+                    console.log("\nCliente registrado con éxito 🚀");
                 } catch (error: any) {
-                    console.log(error.message);
+                    console.log(`\n${error.message}`);
                 }
+                await cuestionario("\nPresione Enter para continuar...");
+                limpiarPantalla();
                 break;
             }
             case "2": {
+                limpiarPantalla();
+                console.log("--- REGISTRAR ADMINISTRADOR ---");
                 const id = parseInt(await cuestionario("ID: "));
                 const nombre = await cuestionario("Nombre: ");
                 const correo = await cuestionario("Correo: ");
                 const acceso = await cuestionario("Nivel de Acceso: ");
                 try {
                     servicio.registrarUsuario(new Administrador(id, nombre, correo, acceso));
-                    console.log("¡Administrador registrado con éxito! 🔑");
+                    console.log("\n¡Administrador registrado con éxito 🔑");
                 } catch (error: any) {
-                    console.log(error.message);
+                    console.log(`\n${error.message}`);
                 }
+                await cuestionario("\nPresione Enter para continuar...");
+                limpiarPantalla();
                 break;
             }
             case "3": {
+                limpiarPantalla();
+                console.log("--- BUSCAR USUARIO ---");
                 const id = parseInt(await cuestionario("ID a buscar: "));
                 const usuario = servicio.buscarPorId(id);
                 if (usuario) {
                     console.log(`\n🔍 Usuario Encontrado (Rol: ${usuario.obtenerRol()}):`);
                     console.log(usuario.obtenerDetalles());
                 } else {
-                    console.log("❌ Usuario no encontrado.");
+                    console.log("\n❌ Usuario no encontrado.");
                 }
+                await cuestionario("\nPresione Enter para continuar...");
+                limpiarPantalla();
                 break;
             }
             case "4": {
-                console.log("\n📋 Lista General de Usuarios:");
-                servicio.obtenerTodos().forEach(u => console.log(u.obtenerDetalles()));
+                limpiarPantalla();
+                console.log("--- LISTA GENERAL DE USUARIOS ---");
+                const lista = servicio.obtenerTodos();
+                if (lista.length === 0) {
+                    console.log("No hay usuarios registrados en el sistema.");
+                } else {
+                    lista.forEach(u => console.log(u.obtenerDetalles()));
+                }
+                await cuestionario("\nPresione Enter para continuar...");
+                limpiarPantalla();
                 break;
             }
             case "5":
+                limpiarPantalla();
                 console.log("Cerrando el sistema... ¡Feliz día!");
                 continuar = false;
                 cerrarReadline();
                 break;
             default:
-                console.log("Opción inválida.");
+                limpiarPantalla();
+                console.log(" Opción inválida. Intente de nuevo.");
+                await cuestionario("\nPresione Enter para continuar...");
+                limpiarPantalla();
         }
     }
 };
