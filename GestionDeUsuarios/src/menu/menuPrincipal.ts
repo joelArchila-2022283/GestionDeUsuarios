@@ -1,4 +1,4 @@
-import { ServicioUsuario } from "../services/ServicioUsuario";
+import { ServicioUsuario } from "../services/UsuarioServices";
 import { Cliente } from "../models/Cliente";
 import { Administrador } from "../models/Administrador";
 import { cuestionario, cerrarReadline, limpiarPantalla } from "../utils/readline";
